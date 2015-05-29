@@ -114,6 +114,17 @@ func (cmd *ggcmd) downloadUpdate(vendorDir string, vendorRoot string, updatedPac
 			ggFatal("Unable to remove dest directory %s", dirMove.DestDir)
 		}
 
+		err = os.MkdirAll(dirMove.DestDir, os.ModePerm)
+		if err != nil {
+			ggFatal("Unable to make target directory %s", dirMove.DestDir)
+		}
+
+		// hack on windows, as it is different than unix "rename"
+		err = os.RemoveAll(dirMove.DestDir)
+		if err != nil {
+			ggFatal("Unable to remove dest directory %s", dirMove.DestDir)
+		}
+
 		err = os.Rename(dirMove.TempDir, dirMove.DestDir)
 		if err != nil {
 			ggFatal("Unable to move from %s to %s", dirMove.TempDir, dirMove.DestDir)
