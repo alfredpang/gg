@@ -24,7 +24,7 @@ type ggcmd struct {
 
 // print out stderr "ERROR: <message>", exit
 func ggFatal(format string, a ...interface{}) {
-	_, _ = fmt.Fprintf(os.Stderr, "ERROR: "+format+"\n", a)
+	_, _ = fmt.Fprintf(os.Stderr, "ERROR: "+format+"\n", a...)
 	os.Exit(1)
 }
 

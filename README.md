@@ -60,7 +60,6 @@ You should keep your vendored directory and your _ggv.json under source control.
 Cavets
 ------
 * Supports one GOPATH path only.
-* Haven't tested on Windows yet. (hopefully soon)
 
 Examples
 --------
