@@ -19,7 +19,7 @@ func (cmd *ggcmd) cmdVupdate() {
 	options.stringVar(&optVendorRoot, "vendor", "", "Vendor package root")
 	options.boolVar(&optShallow, "shallow", false, "Get only pkg or recurse dependencies")
 	options.boolVar(&optSaveRepo, "save-repo", false, "Keep copy of .hg or .git")
-	options.boolVar(&optDepTests, "dep-tests", false, "Also check dependencies of tests")
+	options.boolVar(&optDepTests, "dep-tests", true, "Also check dependencies of tests")
 	options.stringVar(&optRevision, "revision", "", "source control revision hash")
 	options.boolVar(&optTest, "test", false, "Just test to see what will change.")
 

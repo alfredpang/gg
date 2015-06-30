@@ -51,7 +51,14 @@ func (cmd *ggcmd) getMinimalPackagesList(pkgs []string, shallow bool, includeTes
 			continue
 		}
 
-		recursePkgs := cmd.rdepHelper(p, includeTestDeps)
+		var recursePkgs []string
+
+		if knownPkgInfo != nil {
+			// use deptest from the known package info
+			recursePkgs = cmd.rdepHelper(p, knownPkgInfo.DepTests)
+		} else {
+			recursePkgs = cmd.rdepHelper(p, includeTestDeps)
+		}
 		for _, pp := range recursePkgs {
 			pkg, vcs, vcsSource, err := getPkgMeta(pp)
 			if err == nil {
