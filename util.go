@@ -111,7 +111,7 @@ func (cmd *ggcmd) rdepHelper(rpkg string, includeTestDeps bool) []string {
 	hasSeen := map[string]string{}
 	deps := make([]string, 0, len(pkgGoList.Deps)+len(pkgGoList.TestImports))
 	for _, pkg := range pkgGoList.Deps {
-		if cmd.corePkgsMap[pkg] == nil && !strings.HasPrefix(pkg, pkgGoList.ImportPath) {
+		if !cmd.isCorePackage(pkg) && !strings.HasPrefix(pkg, pkgGoList.ImportPath) {
 			if hasSeen[pkg] != "" {
 				continue
 			}
@@ -126,7 +126,7 @@ func (cmd *ggcmd) rdepHelper(rpkg string, includeTestDeps bool) []string {
 	}
 
 	for _, pkg := range pkgGoList.TestImports {
-		if cmd.corePkgsMap[pkg] == nil && !strings.HasPrefix(pkg, pkgGoList.ImportPath) {
+		if !cmd.isCorePackage(pkg) && !strings.HasPrefix(pkg, pkgGoList.ImportPath) {
 			if hasSeen[pkg] != "" {
 				continue
 			}
@@ -154,7 +154,7 @@ func (cmd *ggcmd) ldepHelper(goListArg string, includeTestDeps bool) []string {
 	hasSeen := map[string]string{}
 	deps := make([]string, 0, len(pkgGoList.Deps)+len(pkgGoList.TestImports))
 	for _, pkg := range pkgGoList.Deps {
-		if cmd.corePkgsMap[pkg] == nil && !strings.HasPrefix(pkg, pkgGoList.ImportPath) {
+		if !cmd.isCorePackage(pkg) && !strings.HasPrefix(pkg, pkgGoList.ImportPath) {
 			deps = append(deps, pkg)
 			hasSeen[pkg] = pkg
 		}
@@ -166,7 +166,7 @@ func (cmd *ggcmd) ldepHelper(goListArg string, includeTestDeps bool) []string {
 	}
 
 	for _, pkg := range pkgGoList.TestImports {
-		if cmd.corePkgsMap[pkg] == nil && !strings.HasPrefix(pkg, pkgGoList.ImportPath) {
+		if !cmd.isCorePackage(pkg) && !strings.HasPrefix(pkg, pkgGoList.ImportPath) {
 			if hasSeen[pkg] != "" {
 				continue
 			}
@@ -179,54 +179,14 @@ func (cmd *ggcmd) ldepHelper(goListArg string, includeTestDeps bool) []string {
 	return deps
 }
 
-func (cmd *ggcmd) initCorePkgs() {
-	cmd.corePkgs = []string{
-		"archive/tar", "archive/zip", "bufio", "builtin",
-		"bytes", "compress/bzip2", "compress/flate",
-		"compress/gzip", "compress/lzw", "compress/zlib",
-		"container/heap", "container/list", "container/ring",
-		"crypto", "crypto/aes", "crypto/cipher", "crypto/des",
-		"crypto/dsa", "crypto/ecdsa", "crypto/elliptic",
-		"crypto/hmac", "crypto/md5", "crypto/rand",
-		"crypto/rc4", "crypto/rsa", "crypto/sha1",
-		"crypto/sha256", "crypto/sha512", "crypto/subtle",
-		"crypto/tls", "crypto/x509", "crypto/x509/pkix",
-		"database/sql", "database/sql/driver", "debug/dwarf",
-		"debug/elf", "debug/gosym", "debug/macho", "debug/pe",
-		"debug/plan9obj", "encoding", "encoding/ascii85",
-		"encoding/asn1", "encoding/base32", "encoding/base64",
-		"encoding/binary", "encoding/csv", "encoding/gob",
-		"encoding/hex", "encoding/json", "encoding/pem",
-		"encoding/xml", "errors", "expvar", "flag", "fmt",
-		"go/ast", "go/build", "go/constant", "go/doc",
-		"go/format", "go/importer", "go/internal/gcimporter",
-		"go/parser", "go/printer", "go/scanner", "go/token",
-		"go/types", "hash", "hash/adler32", "hash/crc32",
-		"hash/crc64", "hash/fnv", "html", "html/template",
-		"image", "image/color", "image/color/palette",
-		"image/draw", "image/gif", "image/internal/imageutil",
-		"image/jpeg", "image/png", "index/suffixarray", "io",
-		"io/ioutil", "log", "log/syslog", "math", "math/big",
-		"math/cmplx", "math/rand", "mime", "mime/multipart",
-		"mime/quotedprintable", "net", "net/http",
-		"net/http/cgi", "net/http/cookiejar", "net/http/fcgi",
-		"net/http/httptest", "net/http/httputil",
-		"net/http/internal", "net/http/pprof",
-		"net/internal/socktest", "net/mail", "net/rpc",
-		"net/rpc/jsonrpc", "net/smtp", "net/textproto",
-		"net/url", "os", "os/exec", "os/signal", "os/user",
-		"path", "path/filepath", "reflect", "regexp",
-		"regexp/syntax", "runtime", "runtime/cgo",
-		"runtime/debug", "runtime/pprof", "runtime/race",
-		"sort", "strconv", "strings", "sync", "sync/atomic",
-		"syscall", "testing", "testing/iotest",
-		"testing/quick", "text/scanner", "text/tabwriter",
-		"text/template", "text/template/parse", "time",
-		"unicode", "unicode/utf16", "unicode/utf8", "unsafe"}
-
-	cmd.corePkgsMap = map[string]*string{}
-
-	for _, pkg := range cmd.corePkgs {
-		cmd.corePkgsMap[pkg] = &pkg
+// simple naive way to see if it is an internal package by checking
+// first part of package path and seeing if it is something like github.com or
+// bitbucket.org; if it has a domain name, it's probably not an internal pkg
+func (cmd ggcmd) isCorePackage(name string) bool {
+	if !strings.Contains(name, "/") {
+		return true
 	}
+
+	pkgParts := strings.Split(name, "/")
+	return !strings.Contains(pkgParts[0], ".")
 }

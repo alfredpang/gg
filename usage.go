@@ -227,11 +227,6 @@ Options:
 
 `, cmd.cmdLdep},
 		// ---------------------------------------------------
-		"listcore": {`gg listcore
-
-List packages that gg knows to be the core packages. We will never vendor
-these. Future: add support for multiple golang versions.
-`, cmd.cmdListcore},
 		"pkgmeta": {`gg pkgmeta
 
 Get meta for package.

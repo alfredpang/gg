@@ -14,9 +14,7 @@ type action struct {
 
 // command handling
 type ggcmd struct {
-	commands    map[string]*action
-	corePkgs    []string
-	corePkgsMap map[string]*string // as a hash
+	commands map[string]*action
 
 	// track seen vendored or internal directories
 	astmodSpecialDirs map[string]*string
@@ -31,7 +29,6 @@ func ggFatal(format string, a ...interface{}) {
 func (cmd *ggcmd) init() {
 	gglogDisable()
 	cmd.initCommands()
-	cmd.initCorePkgs()
 }
 
 func (cmd *ggcmd) run() {
