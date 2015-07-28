@@ -23,7 +23,6 @@ Other commands:
 
  rdep     List dependencies of a go-getable package.
  ldep     List dependencies of local directory/package.
- listcore List known core packages.
 
 Special files:
 
